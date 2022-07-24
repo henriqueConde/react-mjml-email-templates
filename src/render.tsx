@@ -33,7 +33,7 @@ const renderHTML = () => {
     const compiledMarkupFromMJML = compileMjml(markupWithHTMLCommented);
     const markupWithoutHTMLComments = compiledMarkupFromMJML.replace(/<!--\s|\s-->/g, '')
     const staticHTML = ReactDOMServer.renderToStaticMarkup(<EmptyTemplate htmlData={markupWithoutHTMLComments} />);
-    const outputFile = `./${campaignName}.html`;
+    const outputFile = `./src/HTML_TEMPLATES/${campaignName}.html`;
     let prettyHtml = prettier.format(decode(staticHTML), { parser: "html" });
     fs.writeFileSync(outputFile, prettyHtml);
   });
