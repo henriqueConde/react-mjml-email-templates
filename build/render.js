@@ -33,7 +33,7 @@ var mjml_react_1 = require("mjml-react");
 var mjml_1 = __importDefault(require("mjml"));
 var html_entities_1 = require("html-entities");
 var templates = {
-    Fashion_Concierge_Email_1: './components/Teste'
+    Fashion_Concierge_Email_1: './templates/Teste'
 };
 var campaignName = 'Fashion_Concierge_Email_1';
 var options = {
@@ -54,10 +54,14 @@ var renderHTML = function () {
         var compiledMarkupFromMJML = compileMjml(markupWithHTMLCommented);
         var markupWithoutHTMLComments = compiledMarkupFromMJML.replace(/<!--\s|\s-->/g, '');
         var staticHTML = server_1["default"].renderToStaticMarkup(react_1["default"].createElement(EmptyTemplate, { htmlData: markupWithoutHTMLComments }));
-        var outputFile = "./output.html";
+        var outputFile = "./".concat(campaignName, ".html");
         fs.writeFileSync(outputFile, (0, html_entities_1.decode)(staticHTML));
     });
 };
+// This step is necessary because MJML compiler do not understand HTML tags
+// if we want to use custom code different from MJML components
+// we need to compile the markup with the HTML commented so MJML compiler does his job without any problems
+// once the code is compiled we can remove the comments in the HTML tags
 function addCommentsInHTMLTags(rawToStringMarkup) {
     var rawMarkupArray = rawToStringMarkup.split('');
     rawMarkupArray.forEach(function (char, index) {

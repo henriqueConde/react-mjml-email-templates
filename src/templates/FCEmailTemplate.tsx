@@ -1,9 +1,9 @@
-import { Mjml, MjmlBody, MjmlButton, MjmlColumn, MjmlHead, MjmlImage, MjmlPreview, MjmlSection, MjmlText, MjmlTitle, render } from 'mjml-react'
+import {MjmlButton, MjmlColumn, MjmlImage, MjmlSection, MjmlText } from 'mjml-react'
 import React from 'react'
-import { CustomComponent } from './CustomComponent'
+import { CustomComponent } from '../components/CustomComponent'
 
 
-function Teste() {
+function FCEmailTemplate() {
   return (
     <>
       <MjmlSection fullWidth backgroundColor="#efefef">
@@ -29,4 +29,4 @@ function Teste() {
   )
 }
 
-export default Teste
+export default FCEmailTemplate

@@ -6,11 +6,10 @@ import mjml2html from 'mjml'
 import {decode} from 'html-entities';
 
 const templates = {
-  Fashion_Concierge_Email_1: './components/Teste',
+  Fashion_Concierge_Email_1: './templates/Teste',
 }
 
 const campaignName = 'Fashion_Concierge_Email_1';
-
 
 const options = {
   keepComments: true,
@@ -19,7 +18,7 @@ const options = {
 }
 
 
-const compileMjml = (str) => {
+const compileMjml = (str: string) => {
   const { html } = mjml2html(str, options);
   return html; 
 }
@@ -32,13 +31,17 @@ const renderHTML = () => {
     const compiledMarkupFromMJML = compileMjml(markupWithHTMLCommented);
     const markupWithoutHTMLComments = compiledMarkupFromMJML.replace(/<!--\s|\s-->/g, '')
     let staticHTML = ReactDOMServer.renderToStaticMarkup(<EmptyTemplate htmlData={markupWithoutHTMLComments} />);
-    let outputFile = `./output.html`;
+    let outputFile = `./${campaignName}.html`;
     fs.writeFileSync(outputFile, decode(staticHTML));
   });
   
 }
 
-function addCommentsInHTMLTags(rawToStringMarkup) {
+// This step is necessary because MJML compiler do not understand HTML tags
+// if we want to use custom code different from MJML components
+// we need to compile the markup with the HTML commented so MJML compiler does his job without any problems
+// once the code is compiled we can remove the comments in the HTML tags
+function addCommentsInHTMLTags(rawToStringMarkup: string) {
   const rawMarkupArray = rawToStringMarkup.split('');
   rawMarkupArray.forEach((char, index) => {
     if(char === '>') {
