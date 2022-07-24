@@ -3,28 +3,27 @@ import React from "react";
 import ReactDOMServer from "react-dom/server";
 import { Mjml, MjmlBody, MjmlHead, MjmlPreview, MjmlTitle } from 'mjml-react'
 import mjml2html from 'mjml'
+import { MJMLParsingOptions } from 'mjml-core'
 import {decode} from 'html-entities';
 import prettier from "prettier";
 
 const templates = {
   Fashion_Concierge_Email_1: './templates/Teste',
-  Tempalte: './templates/Template'
+  Template: './templates/Template'
 }
 
-const campaignName = 'Tempalte';
+const campaignName = process.argv[2];
 
-const options = {
+const options: MJMLParsingOptions = {
   keepComments: true,
   beautify: false,
-  validationLevel: 'skip'
+  validationLevel: "skip",
 }
-
 
 const compileMjml = (str: string) => {
   const { html } = mjml2html(str, options);
   return html; 
 }
-
 
 const renderHTML = () => {
   import(templates[campaignName]).then(({default: Component}) => {
@@ -34,11 +33,12 @@ const renderHTML = () => {
     const markupWithoutHTMLComments = compiledMarkupFromMJML.replace(/<!--\s|\s-->/g, '')
     const staticHTML = ReactDOMServer.renderToStaticMarkup(<EmptyTemplate htmlData={markupWithoutHTMLComments} />);
     const outputFile = `./src/HTML_TEMPLATES/${campaignName}.html`;
-    let prettyHtml = prettier.format(decode(staticHTML), { parser: "html" });
+    const prettyHtml = prettier.format(decode(staticHTML), { parser: "html" });
     fs.writeFileSync(outputFile, prettyHtml);
   });
-  
 }
+
+renderHTML();
 
 // This step is necessary because MJML compiler do not understand HTML tags
 // if we want to use custom code different from MJML components
@@ -62,9 +62,6 @@ function addCommentsInHTMLTags(rawToStringMarkup: string) {
 
   return markupArrayWithSpaces.join('')
 }
-
-
-renderHTML();
 
 function EmptyTemplate({htmlData}) {
   return (

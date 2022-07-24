@@ -3,6 +3,7 @@
     "render": "tsc && node build/render.js"
   },
   "devDependencies": {
+    "@types/mjml": "^4.7.0",
     "@types/mjml-react": "^2.0.4",
     "@types/node": "^18.0.6",
     "@types/prettier": "^2.6.3",
