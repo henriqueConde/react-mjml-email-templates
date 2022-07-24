@@ -15,7 +15,6 @@ function App({styles, children}) {
             <p>Desmond Nyamador</p>
             <p>I just learned an easy way to style React Components</p>
           </div>
-          <Teste />
           {children}
         </div>
       </body>

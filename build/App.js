@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 exports.__esModule = true;
 var react_1 = __importDefault(require("react"));
-var Teste_1 = __importDefault(require("./components/Teste"));
 function App(_a) {
     var styles = _a.styles, children = _a.children;
     return (react_1["default"].createElement("html", { lang: "en" },
@@ -17,7 +16,6 @@ function App(_a) {
                 react_1["default"].createElement("div", null,
                     react_1["default"].createElement("p", null, "Desmond Nyamador"),
                     react_1["default"].createElement("p", null, "I just learned an easy way to style React Components")),
-                react_1["default"].createElement(Teste_1["default"], null),
                 children))));
 }
 exports["default"] = App;
