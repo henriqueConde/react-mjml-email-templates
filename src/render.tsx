@@ -16,7 +16,7 @@ const render = () => {
       console.log(html);
       let htmlWDoc = "<!DOCTYPE html>" + html;
       let prettyHtml = prettier.format(htmlWDoc, { parser: "html" });
-      let outputFile = `./output.html`;
+      let outputFile = `./src/HTML_TEMPLATES/${campaignName}.html`;
       fs.writeFileSync(outputFile, prettyHtml);
       console.log(`Wrote ${outputFile}`);
     });
