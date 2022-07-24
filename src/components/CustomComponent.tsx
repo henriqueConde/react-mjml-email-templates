@@ -1,8 +1,9 @@
 import React from 'react'
+import {styles} from '../styles'
 
 export const CustomComponent = () => {
   return (
-<table>
+<div style={styles.container}>
     <tbody>
         <tr>
             <td>
@@ -13,6 +14,6 @@ export const CustomComponent = () => {
             </td>
         </tr>
     </tbody>
-</table>
+</div>
   )
 }

@@ -30,16 +30,12 @@ var fs = __importStar(require("fs"));
 var react_1 = __importDefault(require("react"));
 var server_1 = __importDefault(require("react-dom/server"));
 var mjml_react_1 = require("mjml-react");
-var he = require('he');
 var mjml_1 = __importDefault(require("mjml"));
 var html_entities_1 = require("html-entities");
 var templates = {
     Fashion_Concierge_Email_1: './components/Teste'
 };
 var campaignName = 'Fashion_Concierge_Email_1';
-var TRANSLATIONS = {
-    greeting: 'HIIIIIIIIII'
-};
 var options = {
     keepComments: true,
     beautify: false,
@@ -52,20 +48,31 @@ var compileMjml = function (str) {
 var renderHTML = function () {
     Promise.resolve().then(function () { return __importStar(require(templates[campaignName])); }).then(function (_a) {
         var Component = _a["default"];
-        var teste = server_1["default"].renderToString(react_1["default"].createElement(EmailWrapper, null,
+        var rawStringMarkup = server_1["default"].renderToString(react_1["default"].createElement(EmailWrapper, null,
             react_1["default"].createElement(Component, null)));
-        console.log(teste);
-        var res = addCommentsInHTMLTags(teste);
-        console.log(res);
-        var algo = compileMjml(res);
-        var hmm = algo.replace(/<!--\s|\s-->/g, '');
-        var staticHTML = server_1["default"].renderToStaticMarkup(react_1["default"].createElement(EmptyTemplate, { htmlData: hmm }));
+        var markupWithHTMLCommented = addCommentsInHTMLTags(rawStringMarkup);
+        var compiledMarkupFromMJML = compileMjml(markupWithHTMLCommented);
+        var markupWithoutHTMLComments = compiledMarkupFromMJML.replace(/<!--\s|\s-->/g, '');
+        var staticHTML = server_1["default"].renderToStaticMarkup(react_1["default"].createElement(EmptyTemplate, { htmlData: markupWithoutHTMLComments }));
         var outputFile = "./output.html";
         fs.writeFileSync(outputFile, (0, html_entities_1.decode)(staticHTML));
     });
 };
-function addCommentsInHTMLTags(str) {
-    return str.trim().replace(/<[^mj|/mj]+.[^m]*>/g, "<!--$&-->");
+function addCommentsInHTMLTags(rawToStringMarkup) {
+    var rawMarkupArray = rawToStringMarkup.split('');
+    rawMarkupArray.forEach(function (char, index) {
+        if (char === '>') {
+            rawMarkupArray[index] = char + ' ';
+        }
+    });
+    var markupArrayWithSpaces = rawMarkupArray.join('').split(/\s(?=<)/g);
+    markupArrayWithSpaces.forEach(function (char, index) {
+        var condition = !char.includes('<mj') && !char.includes('</mj');
+        if (condition) {
+            markupArrayWithSpaces[index] = '<!--' + char + '-->';
+        }
+    });
+    return markupArrayWithSpaces.join('');
 }
 renderHTML();
 function EmptyTemplate(_a) {

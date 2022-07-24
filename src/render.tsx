@@ -1,13 +1,9 @@
 import * as fs from "fs";
-import prettier from "prettier";
-import React, {lazy} from "react";
+import React from "react";
 import ReactDOMServer from "react-dom/server";
-import { Mjml, MjmlBody, MjmlButton, MjmlColumn, MjmlHead, MjmlImage, MjmlPreview, MjmlSection, MjmlText, MjmlTitle, render } from 'mjml-react'
-const he = require('he');
+import { Mjml, MjmlBody, MjmlHead, MjmlPreview, MjmlTitle } from 'mjml-react'
 import mjml2html from 'mjml'
 import {decode} from 'html-entities';
-import App from './App'
-import { styles } from './styles'
 
 const templates = {
   Fashion_Concierge_Email_1: './components/Teste',
@@ -15,9 +11,6 @@ const templates = {
 
 const campaignName = 'Fashion_Concierge_Email_1';
 
-const TRANSLATIONS = {
-  greeting: 'HIIIIIIIIII',
-}
 
 const options = {
   keepComments: true,
@@ -34,22 +27,36 @@ const compileMjml = (str) => {
 
 const renderHTML = () => {
   import(templates[campaignName]).then(({default: Component}) => {
-    const teste = ReactDOMServer.renderToString(<EmailWrapper><Component /></EmailWrapper>)
-    console.log(teste);
-    const res = addCommentsInHTMLTags(teste);
-    console.log(res);
-    const algo = compileMjml(res);
-    const hmm = algo.replace(/<!--\s|\s-->/g, '')
-    let staticHTML = ReactDOMServer.renderToStaticMarkup(<EmptyTemplate htmlData={hmm} />);
+    const rawStringMarkup = ReactDOMServer.renderToString(<EmailWrapper><Component /></EmailWrapper>)
+    const markupWithHTMLCommented = addCommentsInHTMLTags(rawStringMarkup);
+    const compiledMarkupFromMJML = compileMjml(markupWithHTMLCommented);
+    const markupWithoutHTMLComments = compiledMarkupFromMJML.replace(/<!--\s|\s-->/g, '')
+    let staticHTML = ReactDOMServer.renderToStaticMarkup(<EmptyTemplate htmlData={markupWithoutHTMLComments} />);
     let outputFile = `./output.html`;
     fs.writeFileSync(outputFile, decode(staticHTML));
   });
   
 }
 
-function addCommentsInHTMLTags(str) {
-  return str.trim().replace(/<[^mj|/mj]+.[^m]*>/g, "<!--$&-->");
+function addCommentsInHTMLTags(rawToStringMarkup) {
+  const rawMarkupArray = rawToStringMarkup.split('');
+  rawMarkupArray.forEach((char, index) => {
+    if(char === '>') {
+      rawMarkupArray[index] = char + ' ';
+    }
+  })
+  const markupArrayWithSpaces = rawMarkupArray.join('').split(/\s(?=<)/g);
+
+  markupArrayWithSpaces.forEach((char, index) => {
+    const condition = !char.includes('<mj') && !char.includes('</mj')
+    if(condition) {
+      markupArrayWithSpaces[index] = '<!--' + char + '-->'
+    }
+  })
+
+  return markupArrayWithSpaces.join('')
 }
+
 
 renderHTML();
 
