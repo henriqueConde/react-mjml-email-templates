@@ -16,8 +16,6 @@ const campaignName = process.argv[2];
 
 const options: MJMLParsingOptions = {
   keepComments: true,
-  beautify: false,
-  validationLevel: "skip",
 }
 
 const compileMjml = (str: string) => {
