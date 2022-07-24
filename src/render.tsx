@@ -4,12 +4,14 @@ import ReactDOMServer from "react-dom/server";
 import { Mjml, MjmlBody, MjmlHead, MjmlPreview, MjmlTitle } from 'mjml-react'
 import mjml2html from 'mjml'
 import {decode} from 'html-entities';
+import prettier from "prettier";
 
 const templates = {
   Fashion_Concierge_Email_1: './templates/Teste',
+  Tempalte: './templates/Template'
 }
 
-const campaignName = 'Fashion_Concierge_Email_1';
+const campaignName = 'Tempalte';
 
 const options = {
   keepComments: true,
@@ -30,9 +32,10 @@ const renderHTML = () => {
     const markupWithHTMLCommented = addCommentsInHTMLTags(rawStringMarkup);
     const compiledMarkupFromMJML = compileMjml(markupWithHTMLCommented);
     const markupWithoutHTMLComments = compiledMarkupFromMJML.replace(/<!--\s|\s-->/g, '')
-    let staticHTML = ReactDOMServer.renderToStaticMarkup(<EmptyTemplate htmlData={markupWithoutHTMLComments} />);
-    let outputFile = `./${campaignName}.html`;
-    fs.writeFileSync(outputFile, decode(staticHTML));
+    const staticHTML = ReactDOMServer.renderToStaticMarkup(<EmptyTemplate htmlData={markupWithoutHTMLComments} />);
+    const outputFile = `./${campaignName}.html`;
+    let prettyHtml = prettier.format(decode(staticHTML), { parser: "html" });
+    fs.writeFileSync(outputFile, prettyHtml);
   });
   
 }

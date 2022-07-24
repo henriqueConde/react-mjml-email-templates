@@ -32,10 +32,12 @@ var server_1 = __importDefault(require("react-dom/server"));
 var mjml_react_1 = require("mjml-react");
 var mjml_1 = __importDefault(require("mjml"));
 var html_entities_1 = require("html-entities");
+var prettier_1 = __importDefault(require("prettier"));
 var templates = {
-    Fashion_Concierge_Email_1: './templates/Teste'
+    Fashion_Concierge_Email_1: './templates/Teste',
+    Tempalte: './templates/Template'
 };
-var campaignName = 'Fashion_Concierge_Email_1';
+var campaignName = 'Tempalte';
 var options = {
     keepComments: true,
     beautify: false,
@@ -55,7 +57,8 @@ var renderHTML = function () {
         var markupWithoutHTMLComments = compiledMarkupFromMJML.replace(/<!--\s|\s-->/g, '');
         var staticHTML = server_1["default"].renderToStaticMarkup(react_1["default"].createElement(EmptyTemplate, { htmlData: markupWithoutHTMLComments }));
         var outputFile = "./".concat(campaignName, ".html");
-        fs.writeFileSync(outputFile, (0, html_entities_1.decode)(staticHTML));
+        var prettyHtml = prettier_1["default"].format((0, html_entities_1.decode)(staticHTML), { parser: "html" });
+        fs.writeFileSync(outputFile, prettyHtml);
     });
 };
 // This step is necessary because MJML compiler do not understand HTML tags
