@@ -1,42 +1,27 @@
 import * as fs from "fs";
-import prettier from "prettier";
-import React, {lazy} from "react";
+import React from "react";
 import ReactDOMServer from "react-dom/server";
-import {styles} from './styles'
+import {decode} from 'html-entities';
+import prettier from "prettier";
+import { addCommentsInHTMLTags, compileMjml } from "./utils";
+import { EmailWrapper } from "./EmailWrapper";
+import { EmptyTemplate } from "./EmptyTemplate";
+import currentCampaing from "./AllCampaings";
 
-const templates = {
-  Fashion_Concierge_Email_1: './components/Teste',
+const [campaignName, campaignPath] = currentCampaing;
+
+const renderHTML = () => {
+  import(campaignPath).then(({default: Component}) => {
+    const rawStringMarkup = ReactDOMServer.renderToString(<EmailWrapper><Component /></EmailWrapper>)
+    const markupWithHTMLCommented = addCommentsInHTMLTags(rawStringMarkup);
+    const compiledMarkupFromMJML = compileMjml(markupWithHTMLCommented);
+    const markupWithoutHTMLComments = compiledMarkupFromMJML.replace(/<!--\s|\s-->/g, '')
+    const staticHTML = ReactDOMServer.renderToStaticMarkup(<EmptyTemplate htmlData={markupWithoutHTMLComments} />);
+    const outputFile = `./HTML_TEMPLATES/${campaignName}.html`;
+    const prettyHtml = prettier.format(decode(staticHTML), { parser: "html" });
+    fs.writeFileSync(outputFile, prettyHtml);
+    console.log(`${campaignName} email built!`);
+  });
 }
 
-const campaignName = process.argv[2];
-
-const render = () => {
-    import(templates[campaignName]).then(({default: Component}) => {
-      let html = ReactDOMServer.renderToString(<App styles={styles}><Component /></App>);
-      console.log(html);
-      let htmlWDoc = "<!DOCTYPE html>" + html;
-      let prettyHtml = prettier.format(htmlWDoc, { parser: "html" });
-      let outputFile = `./src/HTML_TEMPLATES/${campaignName}.html`;
-      fs.writeFileSync(outputFile, prettyHtml);
-      console.log(`Wrote ${outputFile}`);
-    });
-    
-}
-
-render();
-
-function App({styles, children}) { 
-  return (
-    <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <title>Hello world</title>
-      </head>
-      <body>
-        <div style={styles.container}>
-          {children}
-        </div>
-      </body>
-    </html>
-  );
-}
+renderHTML();
